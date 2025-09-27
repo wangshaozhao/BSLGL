@@ -1,5 +1,4 @@
 import csv
-
 from ogb.nodeproppred import PygNodePropPredDataset
 import torch_geometric.transforms as T
 import torch
@@ -56,26 +55,27 @@ def read_enhanced_text_column(csv_file_path):
         for row in reader:
             enhanced_texts.append(row['enhanced_text'])
     return enhanced_texts
+
 def read_enhanced_text_column_1(csv_file_path):
     """
-    从CSV文件中读取增强文本，提取"Product...Description..."部分
+    Read enhanced text from CSV file and extract "Product...Description..." part
     """
     enhanced_texts = []
     with open(csv_file_path, mode='r', encoding='utf-8') as file:
         reader = csv.DictReader(file)
-        # 校验必要字段是否存在
+        # Verify required fields exist
         required_fields = {'enhanced_text'}
         if not required_fields.issubset(reader.fieldnames):
             missing = required_fields - set(reader.fieldnames)
-            raise ValueError(f"CSV文件缺少必要字段: {missing}")
+            raise ValueError(f"CSV file missing required fields: {missing}")
         for idx, row in enumerate(reader):
             try:
                 full_text = row['enhanced_text']
-                # 提取Title和Abstract部分
+                # Extract Title and Abstract parts
                 title_end = full_text.find('Product:')
                 if title_end == -1:
-                    raise ValueError(f"第{idx}行缺少'Product:'标记")
-                # 截取到Abstract结束（假设Keywords在Product之后）
+                    raise ValueError(f"Row {idx} missing 'Product:' marker")
+                # Extract up to Abstract end (assuming Keywords come after Product)
                 keywords_start = full_text.find('Keywords:', title_end)
                 if keywords_start != -1:
                     extracted = full_text[:keywords_start].strip()
@@ -84,55 +84,56 @@ def read_enhanced_text_column_1(csv_file_path):
 
                 enhanced_texts.append(extracted)
             except Exception as e:
-                raise ValueError(f"处理第{idx}行时出错: {str(e)}") from e
+                raise ValueError(f"Error processing row {idx}: {str(e)}") from e
     return enhanced_texts
 
 
 def read_enhanced_text_column_2(csv_file_path):
     """
-    从CSV文件中读取增强文本，提取"Title...Keywords..."部分
+    Read enhanced text from CSV file and extract "Title...Keywords..." part
     """
     enhanced_texts = []
 
-    # 校验文件是否存在
+    # Verify file exists
     if not os.path.exists(csv_file_path):
-        raise FileNotFoundError(f"文件不存在: {csv_file_path}")
+        raise FileNotFoundError(f"File not found: {csv_file_path}")
 
     with open(csv_file_path, mode='r', encoding='utf-8') as file:
         reader = csv.DictReader(file)
 
-        # 校验必要字段是否存在
+        # Verify required fields exist
         required_fields = {'enhanced_text'}
         if not required_fields.issubset(reader.fieldnames):
             missing = required_fields - set(reader.fieldnames)
-            raise ValueError(f"CSV文件缺少必要字段: {missing}")
+            raise ValueError(f"CSV file missing required fields: {missing}")
 
         for idx, row in enumerate(reader):
             try:
                 full_text = row['enhanced_text']
 
-                # 提取Product到Keywords部分
+                # Extract Product to Keywords part
                 title_end = full_text.find('Description:')
                 keywords_start = full_text.find('Keywords:', title_end if title_end != -1 else 0)
 
                 if keywords_start == -1:
-                    raise ValueError(f"第{idx}行缺少'Keywords:'标记")
+                    raise ValueError(f"Row {idx} missing 'Keywords:' marker")
 
-                # 跳过Description部分，连接Product和Keywords
+                # Skip Description part, connect Product and Keywords
                 if title_end != -1:
                     title_part = full_text[:title_end].strip()
                     keywords_part = full_text[keywords_start:].strip()
                     extracted = f"{title_part}\n{keywords_part}"
                 else:
-                    # 如果没有Abstract，直接取到文件末尾
+                    # If no Abstract, take to end of file
                     extracted = full_text.strip()
 
                 enhanced_texts.append(extracted)
             except Exception as e:
-                raise ValueError(f"处理第{idx}行时出错: {str(e)}") from e
+                raise ValueError(f"Error processing row {idx}: {str(e)}") from e
     return enhanced_texts
+
 def get_raw_text_products(feature_type='orig', use_text=False, seed=0):
-    # 获取项目根目录（load_products.py 在 core/data_utils/ 下）
+    # Get project root directory (load_products.py is under core/data_utils/)
     project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     file_path1 = os.path.join(project_root, 'dataset', 'ogbn_products', 'ogbn-products_subset.pt')
     data = torch.load(file_path1)
@@ -149,7 +150,7 @@ def get_raw_text_products(feature_type='orig', use_text=False, seed=0):
     if feature_type=='orig':
         return data, text
     if feature_type == 'enhanced':
-        # 使用示例
+        # Example usage
         csv_path = os.path.join(project_root, 'enhanced_texts','enhanced_products.csv')
         text = read_enhanced_text_column(csv_path)
         return data, text
@@ -170,24 +171,24 @@ if __name__ == '__main__':
 
 def read_enhanced_text_column_1(csv_file_path):
     """
-    从CSV文件中读取增强文本，提取"Product...Description..."部分
+    Read enhanced text from CSV file and extract "Product...Description..." part
     """
     enhanced_texts = []
     with open(csv_file_path, mode='r', encoding='utf-8') as file:
         reader = csv.DictReader(file)
-        # 校验必要字段是否存在
+        # Verify required fields exist
         required_fields = {'enhanced_text'}
         if not required_fields.issubset(reader.fieldnames):
             missing = required_fields - set(reader.fieldnames)
-            raise ValueError(f"CSV文件缺少必要字段: {missing}")
+            raise ValueError(f"CSV file missing required fields: {missing}")
         for idx, row in enumerate(reader):
             try:
                 full_text = row['enhanced_text']
-                # 提取Title和Abstract部分
+                # Extract Title and Abstract parts
                 title_end = full_text.find('Product:')
                 if title_end == -1:
-                    raise ValueError(f"第{idx}行缺少'Product:'标记")
-                # 截取到Abstract结束（假设Keywords在Product之后）
+                    raise ValueError(f"Row {idx} missing 'Product:' marker")
+                # Extract up to Abstract end (assuming Keywords come after Product)
                 keywords_start = full_text.find('Keywords:', title_end)
                 if keywords_start != -1:
                     extracted = full_text[:keywords_start].strip()
@@ -196,50 +197,50 @@ def read_enhanced_text_column_1(csv_file_path):
 
                 enhanced_texts.append(extracted)
             except Exception as e:
-                raise ValueError(f"处理第{idx}行时出错: {str(e)}") from e
+                raise ValueError(f"Error processing row {idx}: {str(e)}") from e
     return enhanced_texts
 
 
 def read_enhanced_text_column_2(csv_file_path):
     """
-    从CSV文件中读取增强文本，提取"Title...Keywords..."部分
+    Read enhanced text from CSV file and extract "Title...Keywords..." part
     """
     enhanced_texts = []
 
-    # 校验文件是否存在
+    # Verify file exists
     if not os.path.exists(csv_file_path):
-        raise FileNotFoundError(f"文件不存在: {csv_file_path}")
+        raise FileNotFoundError(f"File not found: {csv_file_path}")
 
     with open(csv_file_path, mode='r', encoding='utf-8') as file:
         reader = csv.DictReader(file)
 
-        # 校验必要字段是否存在
+        # Verify required fields exist
         required_fields = {'enhanced_text'}
         if not required_fields.issubset(reader.fieldnames):
             missing = required_fields - set(reader.fieldnames)
-            raise ValueError(f"CSV文件缺少必要字段: {missing}")
+            raise ValueError(f"CSV file missing required fields: {missing}")
 
         for idx, row in enumerate(reader):
             try:
                 full_text = row['enhanced_text']
 
-                # 提取Product到Keywords部分
+                # Extract Product to Keywords part
                 title_end = full_text.find('Description:')
                 keywords_start = full_text.find('Keywords:', title_end if title_end != -1 else 0)
 
                 if keywords_start == -1:
-                    raise ValueError(f"第{idx}行缺少'Keywords:'标记")
+                    raise ValueError(f"Row {idx} missing 'Keywords:' marker")
 
-                # 跳过Description部分，连接Product和Keywords
+                # Skip Description part, connect Product and Keywords
                 if title_end != -1:
                     title_part = full_text[:title_end].strip()
                     keywords_part = full_text[keywords_start:].strip()
                     extracted = f"{title_part}\n{keywords_part}"
                 else:
-                    # 如果没有Abstract，直接取到文件末尾
+                    # If no Abstract, take to end of file
                     extracted = full_text.strip()
 
                 enhanced_texts.append(extracted)
             except Exception as e:
-                raise ValueError(f"处理第{idx}行时出错: {str(e)}") from e
+                raise ValueError(f"Error processing row {idx}: {str(e)}") from e
     return enhanced_texts
