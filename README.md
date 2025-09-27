@@ -36,9 +36,25 @@ The following related files need to be downloaded.
 **BSLGL_processed texts:**  
 [enhanced_texts](https://drive.google.com/drive/folders/1e8WMWOM46jhUhMQqwn0cJPCZSIv0J-lN?usp=drive_link)
 
+**All of Embeddings**
+[embeddings](https://drive.google.com/drive/folders/1yEc8ughAx5xzqLnwSqCZ2v9RLYfpPDAh?usp=drive_link)
+
+**Results of LLM-as-Predictors**
+[llm_predict_result](https://drive.google.com/drive/folders/10_am9RXS2BbV6aHuSOmfQur5GLLUDGyV?usp=drive_link)
+
 ## 3.Train
-**Example：**
+**You should ensure that the following folders—code, dataset, embeddings, enhanced_texts, and llm_predict_result—are present in your root directory (BSLGL).**
 
+**code:** Core code Logicc.
+
+**dataset:** Orig TAGs datasets.
+
+**embeddings:** All encoded embeddings used in This project .
+
+**llm_predict_result:** Results of direct text prediction by LLMs.
+
+**Run Example：**
+```
 python -m code.trainGNN  --dataset cora --gnn_model_name SAGE --gnn_train_feature_type enhanced
-
-Specific parameter modifications can be made by selecting the corresponding options in the **BSLGL/code/config.py** file according to needs.
+```
+Specific parameter modifications can be made by selecting the corresponding options in the **BSLGL/code/config.py** file according to your needs.
