@@ -7,19 +7,19 @@ import re
 
 class LLMClassifier:
     def __init__(self, api_key, output_file):
-        # 初始化输出文件设置
+        # Initialize output file settings
         self.output_file = output_file
         self.output_dir = os.path.dirname(self.output_file)
 
-        # 大模型API配置
+        # LLM API configuration
         self.api_url = "https://api.siliconflow.cn/v1/chat/completions"
         self.headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
         }
-        self.model = 'deepseek-ai/DeepSeek-V3.1' #"deepseek-ai/DeepSeek-R1"
+        self.model = 'deepseek-ai/DeepSeek-R1' #"deepseek-ai/DeepSeek-R1"
 
-        # 数据存储
+        # Data storage
         self.texts = None
         self.true_labels = None
         self.label_map = None
@@ -27,44 +27,40 @@ class LLMClassifier:
         self._create_output_dir()
 
     def _create_output_dir(self):
-        """创建输出目录"""
+        """Create output directory if it doesn't exist"""
         if not os.path.exists(self.output_dir):
             os.makedirs(self.output_dir)
             print(f"Created output directory: {self.output_dir}")
 
     def load_texts(self, texts):
-        """加载待分类文本"""
+        """Load texts to be classified"""
         if not isinstance(texts, list) or len(texts) == 0:
             raise ValueError("Input texts must be a non-empty list")
         self.texts = texts
         print(f"Successfully loaded {len(self.texts)} text records")
         return True
 
-    # def set_labels(self, true_labels, label_map):
-    #     """设置真实标签和标签映射"""
-    #     self.true_labels = true_labels
-    #     self.label_map = label_map
     def set_labels(self, true_labels, label_map):
-        """设置真实标签和标签映射（新增解嵌套逻辑）"""
+        """Set true labels and label mapping (with nested list handling)"""
 
-        # 解嵌套逻辑：如果元素是列表，取第一个元素；否则保留原元素
+        # Unpack nested labels: if element is list, take first element; otherwise keep original
         def _unpack_label(label):
             if isinstance(label, list):
-                # 处理空列表的极端情况
-                return label[0] if label else -1  # 空列表返回无效标签-1
+                # Handle empty list edge case
+                return label[0] if label else -1  # Return invalid label -1 for empty list
             return label
 
-        # 对所有标签执行解嵌套
+        # Apply unpacking to all labels
         self.true_labels = [_unpack_label(label) for label in true_labels]
         self.label_map = label_map
 
-        # 额外校验：确保处理后的标签是可转整数的类型
-        for i, label in enumerate(self.true_labels[:5]):  # 仅校验前5个，避免输出过长
+        # Additional validation: ensure processed labels can be converted to integers
+        for i, label in enumerate(self.true_labels[:5]):  # Only check first 5 to avoid long output
             if not isinstance(label, (int, str, float)):
-                print(f"警告：索引 {i} 的标签类型仍异常，值={label}, 类型={type(label)}")
+                print(f"Warning: Label at index {i} has abnormal type, value={label}, type={type(label)}")
 
     def call_llm_api(self, prompt):
-        """调用LLM API"""
+        """Call LLM API"""
         payload = {
             "model": self.model,
             "messages": [{"role": "user", "content": prompt}],
@@ -87,11 +83,11 @@ class LLMClassifier:
             return None
 
     def is_valid_label(self, label_num):
-        """验证标签是否有效"""
+        """Validate if label is valid"""
         return label_num is not None and label_num in self.label_map
 
     def extract_class_label(self, llm_response):
-        """从响应中提取数字标签"""
+        """Extract numeric label from response"""
         if not llm_response:
             return None
         numbers = re.findall(r'\d+', llm_response)
@@ -118,14 +114,14 @@ class LLMClassifier:
     [number]"""
 
     def get_llm_prediction_with_retry(self, text, max_attempts=50):
-        """获取预测结果（带重试机制）"""
+        """Get prediction with retry mechanism"""
         prompt = self.generate_classification_prompt(text, self.label_map)
 
         for attempt in range(1, max_attempts + 1):
             llm_response = self.call_llm_api(prompt)
 
             if not llm_response:
-                print(f"API调用失败，重试中... ({attempt}/{max_attempts})")
+                print(f"API call failed, retrying... ({attempt}/{max_attempts})")
                 time.sleep(2)
                 continue
 
@@ -134,14 +130,14 @@ class LLMClassifier:
             if self.is_valid_label(label_num):
                 return label_num, self.label_map[label_num], llm_response
 
-            print(f"无效响应: '{llm_response}'，提取数字: {label_num}，重试中... ({attempt}/{max_attempts})")
+            print(f"Invalid response: '{llm_response}', extracted number: {label_num}, retrying... ({attempt}/{max_attempts})")
             time.sleep(1)
 
-        print(f"⚠️ 达到最大重试次数 {max_attempts} 次")
+        print(f"⚠️ Reached maximum retry attempts {max_attempts}")
         return -1, "MAX_RETRY_EXCEEDED", None
 
     def process_classification(self, start_index=0, end_index=None):
-        """执行分类流程"""
+        """Execute classification process"""
         if not all([self.texts, self.true_labels, self.label_map]):
             raise ValueError("Please load texts and labels first")
 
@@ -155,7 +151,7 @@ class LLMClassifier:
 
         print(f"Processing texts {start}-{end - 1} of {total}")
 
-        # 准备输出文件
+        # Prepare output file
         columns = ['index', 'predicted_num', 'predicted_text',
                    'true_num', 'true_text', 'enhanced_text']
         file_exists = os.path.exists(self.output_file)
@@ -174,7 +170,7 @@ class LLMClassifier:
 
                     print(f"Processing {i + 1}/{total} (True: {true_text})")
 
-                    # 获取预测结果（带重试）
+                    # Get prediction (with retry)
                     pred_num, pred_text, _ = self.get_llm_prediction_with_retry(text)
 
                     writer.writerow({
