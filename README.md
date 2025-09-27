@@ -8,11 +8,11 @@ conda create -n BSLGL python=3.8 -y
 
 conda activate BSLGL
 
-**CPU**
+#CPU
 
 conda install pytorch torchvision torchaudio cpuonly -c pytorch -y
 
-**GPU**
+#GPU
 
 conda install pytorch torchvision torchaudio cudatoolkit=11.7 -c pytorch -y
 
@@ -36,10 +36,10 @@ The following related files need to be downloaded.
 **BSLGL_processed texts:**  
 [enhanced_texts](https://drive.google.com/drive/folders/1e8WMWOM46jhUhMQqwn0cJPCZSIv0J-lN?usp=drive_link)
 
-**All of Embeddings**
+**All of Embeddings:**
 [embeddings](https://drive.google.com/drive/folders/1yEc8ughAx5xzqLnwSqCZ2v9RLYfpPDAh?usp=drive_link)
 
-**Results of LLM-as-Predictors**
+**Results of LLM-as-Predictors:**
 [llm_predict_result](https://drive.google.com/drive/folders/10_am9RXS2BbV6aHuSOmfQur5GLLUDGyV?usp=drive_link)
 
 ## 3.Train
