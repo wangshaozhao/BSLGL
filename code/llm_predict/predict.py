@@ -6,14 +6,15 @@ from api import LLMClassifier
 import os
 
 if __name__ == "__main__":
-    # 配置API密钥和输出路径
-    api_key = "sk-yssamqbdjvmyflrhgmjzzqycdrjlbfkzvlkmsubpzuyxdsme"
-    dataset = 'cora'
-    # 定义输出文件路径
+    # Configure API key and output path
+    api_key = "your api key"
+    dataset = 'cora'  # Can be 'cora', 'pubmed', or 'arxiv-2023'
+    
+    # Define output file path
     output_dir = os.path.join(os.path.dirname(__file__), "..", "..", "llm_predict_result")
     output_dir = os.path.normpath(output_dir)
 
-    # 根据数据集配置参数
+    # Configure parameters based on dataset
     if dataset == "cora":
         output_file = os.path.join(output_dir, "predict_cora_enhanced.csv")
         label_map = {
@@ -37,6 +38,7 @@ if __name__ == "__main__":
         data, texts = get_raw_text_pubmed('orig', True)
         true_labels = data.y.tolist()
     elif dataset == "arxiv-2023":
+        output_file = os.path.join(output_dir, "predict_arxiv-2023_orig.csv")
         label_map = {
             1: "Human-Computer Interaction",
             2: "Logic in Computer Science",
@@ -77,15 +79,15 @@ if __name__ == "__main__":
             38: "Digital Libraries",
             39: "Discrete Mathematics"
         }
-        output_file = os.path.join(output_dir, "predict_arxiv-2023_orig.csv")
         data, texts = get_raw_text_arxiv_2023('orig', True)
         true_labels = data.y.tolist()
     else:
         raise ValueError(f"Unsupported dataset: {dataset}")
 
-    # 初始化分类器
+    # Initialize classifier
     classifier = LLMClassifier(api_key, output_file)
     classifier.load_texts(texts)
     classifier.set_labels(true_labels, label_map)
-    # 执行分类
+    
+    # Execute classification (first 10 samples for testing)
     classifier.process_classification(start_index=0, end_index=10)
