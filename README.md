@@ -27,5 +27,15 @@ python -c "import nltk; nltk.download('punkt')"
 ## 2.Download
 The following related files need to be downloaded.
 
-Orig TAGs datasets
+**Orig TAGs datasets:**  
 [dataset](https://drive.google.com/drive/folders/158wnv1zp2xOX2fKCUeLrzpxrpKRkJJzO?usp=drive_link)
+
+**BSLGL_processed texts:**  
+[enhanced_texts](https://drive.google.com/drive/folders/1e8WMWOM46jhUhMQqwn0cJPCZSIv0J-lN?usp=drive_link)
+
+## 3.Train
+**Example：**
+
+python -m code.trainGNN  --dataset cora --gnn_model_name SAGE --gnn_train_feature_type enhanced
+
+Specific parameter modifications can be made by selecting the corresponding options in the **BSLGL/code/config.py** file according to needs.
