@@ -2,6 +2,7 @@
 <img src="./figure_1.png">
 
 ## 1.Environment Setup with Conda
+'''
 
 conda create -n BSLGL python=3.8 -y
 
@@ -24,6 +25,7 @@ conda install -c anaconda gensim nltk pytz -y
 conda install -c pyg pyg -y
 
 python -c "import nltk; nltk.download('punkt')"
+'''
 
 ## 2.Download
 The following related files need to be downloaded.
