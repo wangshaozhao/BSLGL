@@ -10,8 +10,6 @@ import json
 import pandas as pd
 
 # return pubmed dataset as pytorch geometric Data object together with 60/20/20 split, and list of pubmed IDs
-
-
 def get_pubmed_casestudy(corrected=False, SEED=0):
     _, data_X, data_Y, data_pubid, data_edges = parse_pubmed()
     data_X = normalize(data_X, norm="l1")
@@ -146,26 +144,27 @@ def read_enhanced_text_column(csv_file_path):
         for row in reader:
             enhanced_texts.append(row['enhanced_text'])
     return enhanced_texts
+
 def read_enhanced_text_column_1(csv_file_path):
     """
-    从CSV文件中读取增强文本，提取"Title...Abstract..."部分
+    Read enhanced text from CSV file and extract "Title...Abstract..." part
     """
     enhanced_texts = []
     with open(csv_file_path, mode='r', encoding='utf-8') as file:
         reader = csv.DictReader(file)
-        # 校验必要字段是否存在
+        # Verify required fields exist
         required_fields = {'enhanced_text'}
         if not required_fields.issubset(reader.fieldnames):
             missing = required_fields - set(reader.fieldnames)
-            raise ValueError(f"CSV文件缺少必要字段: {missing}")
+            raise ValueError(f"CSV file missing required fields: {missing}")
         for idx, row in enumerate(reader):
             try:
                 full_text = row['enhanced_text']
-                # 提取Title和Abstract部分
+                # Extract Title and Abstract parts
                 title_end = full_text.find('Abstract:')
                 if title_end == -1:
-                    raise ValueError(f"第{idx}行缺少'Abstract:'标记")
-                # 截取到Abstract结束（假设Keywords在Abstract之后）
+                    raise ValueError(f"Row {idx} missing 'Abstract:' marker")
+                # Extract up to Abstract end (assuming Keywords come after Abstract)
                 keywords_start = full_text.find('Keywords:', title_end)
                 if keywords_start != -1:
                     extracted = full_text[:keywords_start].strip()
@@ -174,54 +173,55 @@ def read_enhanced_text_column_1(csv_file_path):
 
                 enhanced_texts.append(extracted)
             except Exception as e:
-                raise ValueError(f"处理第{idx}行时出错: {str(e)}") from e
+                raise ValueError(f"Error processing row {idx}: {str(e)}") from e
 
     return enhanced_texts
 
 
 def read_enhanced_text_column_2(csv_file_path):
     """
-    从CSV文件中读取增强文本，提取"Title...Keywords..."部分
+    Read enhanced text from CSV file and extract "Title...Keywords..." part
     """
     enhanced_texts = []
 
-    # 校验文件是否存在
+    # Verify file exists
     if not os.path.exists(csv_file_path):
-        raise FileNotFoundError(f"文件不存在: {csv_file_path}")
+        raise FileNotFoundError(f"File not found: {csv_file_path}")
 
     with open(csv_file_path, mode='r', encoding='utf-8') as file:
         reader = csv.DictReader(file)
 
-        # 校验必要字段是否存在
+        # Verify required fields exist
         required_fields = {'enhanced_text'}
         if not required_fields.issubset(reader.fieldnames):
             missing = required_fields - set(reader.fieldnames)
-            raise ValueError(f"CSV文件缺少必要字段: {missing}")
+            raise ValueError(f"CSV file missing required fields: {missing}")
 
         for idx, row in enumerate(reader):
             try:
                 full_text = row['enhanced_text']
 
-                # 提取Title到Keywords部分
+                # Extract Title to Keywords part
                 title_end = full_text.find('Abstract:')
                 keywords_start = full_text.find('Keywords:', title_end if title_end != -1 else 0)
 
                 if keywords_start == -1:
-                    raise ValueError(f"第{idx}行缺少'Keywords:'标记")
+                    raise ValueError(f"Row {idx} missing 'Keywords:' marker")
 
-                # 跳过Abstract部分，连接Title和Keywords
+                # Skip Abstract part, connect Title and Keywords
                 if title_end != -1:
                     title_part = full_text[:title_end].strip()
                     keywords_part = full_text[keywords_start:].strip()
                     extracted = f"{title_part}\n{keywords_part}"
                 else:
-                    # 如果没有Abstract，直接取到文件末尾
+                    # If no Abstract, take to end of file
                     extracted = full_text.strip()
 
                 enhanced_texts.append(extracted)
             except Exception as e:
-                raise ValueError(f"处理第{idx}行时出错: {str(e)}") from e
+                raise ValueError(f"Error processing row {idx}: {str(e)}") from e
     return enhanced_texts
+
 def get_raw_text_pubmed(feature_type='orig', use_text=False, seed=0):
     data, data_pubid = get_pubmed_casestudy(SEED=seed)
     if not use_text:
@@ -243,7 +243,7 @@ def get_raw_text_pubmed(feature_type='orig', use_text=False, seed=0):
     if feature_type == 'orig':
         return data, text
     if feature_type == 'enhanced':
-        # 使用示例
+        # Example usage
         csv_path = os.path.join(project_root, 'enhanced_texts','enhanced_pubmed.csv')
         text = read_enhanced_text_column(csv_path)
         return data, text
@@ -258,28 +258,28 @@ def get_raw_text_pubmed(feature_type='orig', use_text=False, seed=0):
 
 
 if __name__ == "__main__":
-    # 获取数据集（不使用文本特征）
+    # Get dataset (without using text features)
     data, text = get_raw_text_pubmed("orig", False)
 
-    # 定义CSV文件路径
-    file_path = r"C:\Users\王绍召\Downloads\pubmed.csv"
+    # Define CSV file path
+    file_path = r"C:\Users\Wang Shaozhao\Downloads\pubmed.csv"
 
     try:
-        # 读取CSV文件中的预测值（第一列，无列索引）
+        # Read predicted values from CSV file (first column, no column index)
         predictions = []
         with open(file_path, mode='r', encoding='utf-8') as file:
             reader = csv.reader(file)
             for row in reader:
-                # 确保每行至少有一个元素
+                # Ensure each row has at least one element
                 if row:
-                    # 假设预测值是整数类型
+                    # Assume predicted values are integers
                     predictions.append(int(row[0]))
 
-        # 验证预测值数量与样本数量是否一致
+        # Verify number of predictions matches number of samples
         if len(predictions) != len(data.y):
-            raise ValueError(f"预测值数量({len(predictions)})与样本数量({len(data.y)})不匹配")
+            raise ValueError(f"Number of predictions ({len(predictions)}) doesn't match number of samples ({len(data.y)})")
 
-        # 计算准确率
+        # Calculate accuracy
         correct = 0
         total = len(data.y)
         for pred, true in zip(predictions, data.y.numpy()):
@@ -287,9 +287,9 @@ if __name__ == "__main__":
                 correct += 1
 
         accuracy = correct / total
-        print(f"预测准确率: {accuracy:.4f} ({correct}/{total})")
+        print(f"Prediction accuracy: {accuracy:.4f} ({correct}/{total})")
 
     except FileNotFoundError:
-        print(f"错误: 找不到文件 {file_path}")
+        print(f"Error: File not found {file_path}")
     except Exception as e:
-        print(f"计算准确率时出错: {str(e)}")
+        print(f"Error calculating accuracy: {str(e)}")
