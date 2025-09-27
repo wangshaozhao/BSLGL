@@ -45,7 +45,7 @@ The following related files need to be downloaded.
 ## 3.Train
 **You should ensure that the following folders—code, dataset, embeddings, enhanced_texts, and llm_predict_result—are present in your root directory (BSLGL).**
 
-**code:** Core code Logicc.
+**code:** Core code Logic.
 
 **dataset:** Orig TAGs datasets.
 
