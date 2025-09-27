@@ -35,7 +35,6 @@ import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 
 def generate_bow_embeddings_cora(texts, emb_path, max_features=1000, min_df=1):
-    """生成并保存 BoW 嵌入"""
     if not os.path.exists(emb_path):
         os.makedirs(os.path.dirname(emb_path), exist_ok=True)
         vectorizer = CountVectorizer(max_features=max_features, min_df=min_df)
@@ -48,15 +47,11 @@ from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import PCA
 
 def generate_bow_embeddings_products(texts, emb_path, max_features=1433, min_df=10):
-    """
-    为 ogbn-products 生成 BoW 嵌入，先提取 BoW 特征，再用 PCA 降维到 100
-    """
+
     if not os.path.exists(emb_path):
         os.makedirs(os.path.dirname(emb_path), exist_ok=True)
-        # 生成 BoW 特征
         vectorizer = CountVectorizer(max_features=max_features, min_df=min_df)
         bow_embeddings = vectorizer.fit_transform(texts).toarray()
-        # PCA 降维到 100 维
         pca = PCA(n_components=100)
         pca_embeddings = pca.fit_transform(bow_embeddings)
         np.save(emb_path, pca_embeddings)
@@ -67,12 +62,9 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 
 def generate_embeddings_pubmed(texts, emb_path, max_features=500):
-    """
-    为 PubMed 生成 TF-IDF 嵌入，词典大小为 500
-    """
+
     if not os.path.exists(emb_path):
         os.makedirs(os.path.dirname(emb_path), exist_ok=True)
-        # 生成 TF-IDF 特征
         vectorizer = TfidfVectorizer(max_features=max_features)
         tfidf_embeddings = vectorizer.fit_transform(texts).toarray()
         np.save(emb_path, tfidf_embeddings)
@@ -83,19 +75,17 @@ import numpy as np
 from gensim.models import Word2Vec
 from nltk.tokenize import word_tokenize
 import nltk
-nltk.download('punkt')  # 下载分词所需的资源
+nltk.download('punkt')  
 
 def generate_embeddings_ogbn_arxiv(texts, emb_path, embedding_dim=128):
-    """
-    为 ogbn-arxiv 生成 skip - gram 词嵌入，维度为 128
-    """
+
     if not os.path.exists(emb_path):
         os.makedirs(os.path.dirname(emb_path), exist_ok=True)
-        # 对文本进行分词
+
         tokenized_texts = [word_tokenize(text.lower()) for text in texts]
-        # 训练 skip - gram 模型
+
         model = Word2Vec(sentences=tokenized_texts, vector_size=embedding_dim, sg=1, window=5, min_count=1, workers=4)
-        # 获取每个文本的嵌入（这里简单地将文本中所有词的嵌入取平均，可根据需求调整）
+
         text_embeddings = []
         for tokens in tokenized_texts:
             embeddings = [model.wv[token] for token in tokens if token in model.wv]
@@ -114,16 +104,12 @@ from nltk.tokenize import word_tokenize
 
 
 def generate_embeddings_arxiv_2023(texts, emb_path, embedding_dim=300):
-    """
-    为 tape-arxiv23 生成 Word2Vec 词嵌入，维度为 300
-    """
+
     if not os.path.exists(emb_path):
         os.makedirs(os.path.dirname(emb_path), exist_ok=True)
-        # 对文本进行分词
         tokenized_texts = [word_tokenize(text.lower()) for text in texts]
-        # 训练 Word2Vec 模型（默认使用 CBOW 模式，若要指定 skip-gram 可设置 sg=1）
+
         model = Word2Vec(sentences=tokenized_texts, vector_size=embedding_dim, window=5, min_count=1, workers=4)
-        # 获取每个文本的嵌入（这里简单地将文本中所有词的嵌入取平均，可根据需求调整）
         text_embeddings = []
         for tokens in tokenized_texts:
             embeddings = [model.wv[token] for token in tokens if token in model.wv]
