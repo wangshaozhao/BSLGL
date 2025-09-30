@@ -28,7 +28,7 @@ python -c "import nltk; nltk.download('punkt')"
 ## 2. Download Required Files📥
 The following related files need to be downloaded:
 
-| Resource Type               | Description                          | Download Link |
+| Resource Type               | Description                          | Link          |
 |-----------------------------|--------------------------------------|---------------|
 | **Original TAGs datasets**  | Base datasets for all experiments    | [Download](https://drive.google.com/drive/folders/158wnv1zp2xOX2fKCUeLrzpxrpKRkJJzO?usp=drive_link) |
 | **BSLGL processed texts**   | Enhanced text data                  | [Download](https://drive.google.com/drive/folders/1e8WMWOM46jhUhMQqwn0cJPCZSIv0J-lN?usp=drive_link) |
