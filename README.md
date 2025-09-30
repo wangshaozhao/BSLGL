@@ -1,5 +1,5 @@
 # Graph Learning on Text-Attributed Graphs: Bias Mitigation and Semantic Smoothing via LLMs
-<img src="./figure_1.png">
+<img src="./framework.png">
 
 ## 1.Environment Setup with Conda
 ```
