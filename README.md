@@ -1,4 +1,4 @@
-# Graph Learning on Text-Attributed Graphs: Bias Mitigation and Semantic Smoothing via LLMs
+# Toward More Expressive Graphs: LLM-Driven Bias Mitigation and Semantic Smoothing for Text-Attributed Graphs
 <img src="./framework.png">
 
 ## 1.Environment Setup with Conda
