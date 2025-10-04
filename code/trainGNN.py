@@ -1,12 +1,12 @@
 import torch
 import os
 
-from core.GNNs.gnn_utils import Evaluator, EarlyStopping
+from code.GNNs.gnn_utils import Evaluator, EarlyStopping
 
-from core.config import  update_cfg,cfg
-from core.data_utils.load import load_data
-from core.sentence_bert.encoder import SBERTEncoder
-from core.utils import generate_bow_embeddings_cora
+from code.config import  update_cfg,cfg
+from code.data_utils.load import load_data
+from code.sentence_bert.encoder import SBERTEncoder
+from code.utils import generate_bow_embeddings_cora
 
 
 class GNNTrainer:
@@ -133,11 +133,11 @@ class GNNTrainer:
         print(self.gnn_name)
         print(self.dataset_name)
         if self.gnn_name == 'GCN':
-            from core.GNNs.GCN.model import GCN as GNN
+            from code.GNNs.GCN.model import GCN as GNN
         elif self.gnn_name == 'SAGE':
-            from core.GNNs.SAGE.model import SAGE as GNN
+            from code.GNNs.SAGE.model import SAGE as GNN
         elif self.gnn_name == 'MLP':
-            from core.GNNs.MLP.model import MLP as GNN
+            from code.GNNs.MLP.model import MLP as GNN
         else:
             raise ValueError(f"not support: {self.gnn_name}")
 
